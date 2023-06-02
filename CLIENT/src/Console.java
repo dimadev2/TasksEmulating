@@ -10,6 +10,12 @@ public class Console {
     Socket Server;
     PrintStream Out;
     BufferedReader In;
+
+    private enum CODES {
+        YES_ANSWER, NO_ANSWER,
+        END_CODE
+    }
+
     final String EXIT_COMMAND = "EXIT";
 
     public Console(String serverHost, int port) throws IOException {
@@ -41,8 +47,32 @@ public class Console {
         Scanner in = new Scanner(System.in);
 
         do {
+            System.out.print("~#: ");
             buffer = in.nextLine();
             Out.println(buffer);
+            String code;
+            try {
+                code = In.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            if (CODES.valueOf(code) == CODES.YES_ANSWER) {
+                RecvAnswer();
+            }
         } while (!buffer.equals(EXIT_COMMAND));
+    }
+
+    private void RecvAnswer() {
+        String msg;
+        try {
+            msg = In.readLine();
+            while (!msg.equals(CODES.END_CODE.name())) {
+                System.out.println(msg);
+                msg = In.readLine();
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
