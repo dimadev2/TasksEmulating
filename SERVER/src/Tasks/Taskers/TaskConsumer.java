@@ -21,24 +21,20 @@ final public class TaskConsumer extends AbstractTasker implements Runnable {
     }
 
     public void run() {
-        while (true) {
-            if (!thread.isInterrupted()) {
-                try {
+        try {
+            while (true) {
+                if (!thread.isInterrupted()) {
                     GetTask();
-                } catch (InterruptedException e) {
+                    ExecuteTask();
+                } else {
                     return;
                 }
-                ExecuteTask();
-            }
-            else {
-                return;
-            }
 
-            try {
                 Thread.sleep(SleepTime);
-            } catch (InterruptedException e) {
-                return;
             }
+        }
+        catch (InterruptedException ignored) {
+
         }
     }
 
@@ -46,7 +42,9 @@ final public class TaskConsumer extends AbstractTasker implements Runnable {
         Out.println(thread.getName() + " waiting for a task");
         CurrentTask = Storage.getTask();
         Out.println(thread.getName() + " got new task");
+//        Out.println("Storage size: " + Storage.GetSize());
     }
+
     private void ExecuteTask() {
 //        System.out.println(thread.getName() + " executing task");
         CurrentTask.execute();

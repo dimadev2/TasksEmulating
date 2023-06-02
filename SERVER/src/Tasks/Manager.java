@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Manager {
-    private TaskStorage Storage;
+    volatile private TaskStorage Storage;
     Map<Integer, TaskConsumer> ConsumersMap = new HashMap<>();
     Map<Integer, AbstractProducer> ProducersMap = new HashMap<>();
 
@@ -37,8 +37,8 @@ public class Manager {
     }
 
     public void AddProducer(String[] args) {
-        int sleepTime = Integer.parseInt(args[1]);
-        String className = args[2];
+        String className = args[1];
+        int sleepTime = Integer.parseInt(args[2]);
         try {
             Class prodClass = Class.forName("Tasks.Taskers.Producers." + className);
             Constructor prodConstructor = prodClass.getConstructor(TaskStorage.class, Integer.class);
@@ -70,5 +70,9 @@ public class Manager {
         }
         ProducersMap = new HashMap<>();
         ConsumersMap = new HashMap<>();
+    }
+
+    public int GetStorageSize() {
+        return Storage.GetSize();
     }
 }

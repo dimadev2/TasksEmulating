@@ -1,8 +1,8 @@
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 import Tasks.Manager;
 
@@ -13,6 +13,11 @@ public class Server {
     BufferedReader In;
 
     Manager manager;
+
+    private enum CODES {
+        YES_ANSWER, NO_ANSWER,
+        END_CODE
+    }
 
     final String EXIT_COMMAND = "EXIT";
 
@@ -30,8 +35,11 @@ public class Server {
         System.out.println("Connected successfully");
 
         int capacity;
-        Scanner in = new Scanner(In);
-        capacity = in.nextInt();
+        try {
+            capacity = Integer.parseInt(In.readLine());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         manager = new Manager(capacity, System.out);
 
         RunSession();
@@ -41,22 +49,53 @@ public class Server {
         String inputLine;
         Class[] parameterTypes = new Class[] {String[].class};
         try {
-            while (!(inputLine = In.readLine()).equals(EXIT_COMMAND)) {
+            do {
+                try {
+                    inputLine = In.readLine();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 String[] args = inputLine.split(" ");
-                String method = args[0];
+                String metName = args[0];
 
-                Manager.class.getDeclaredMethod(method, parameterTypes).invoke(manager, args);
+                if (metName.equals("help")) {
+                    Out.println(CODES.YES_ANSWER.name());
+                    Out.flush();
+                    Help();
+                }
+                else {
+                    Out.println(CODES.NO_ANSWER);
+                    Out.flush();
+                    Method met = manager.getClass().getDeclaredMethod(metName, parameterTypes);
+                    met.invoke(manager, (Object)args);
+                }
+//                System.out.println("Storage size: " + manager.GetStorageSize());
 //                System.out.println(inputLine);
-            }
+            } while (!(inputLine = In.readLine()).equals(EXIT_COMMAND));
+
+            manager.Reset(null);
         }
         catch (IOException e) {
             System.out.println("IOException in RunSession() Server method");
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            Out.println("No such method");
+            Out.flush();
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            Out.println("ERROR: InvocationTargetException");
+            Out.flush();
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            Out.println("ERROR: IllegalAccessException");
+            Out.flush();
         }
+    }
+
+    private void Help() {
+        Out.println("\t- Available commands:");
+        Out.println("\t- AddConsumer <delay in milisecs>");
+        Out.println("\t- RemoveConsumer <consumer id> - id written in [x] in the terminal");
+        Out.println("\t- AddProducer <producer name> <delay in milisecs>");
+        Out.println("\t- RemoveProducer <producer id>");
+        Out.println(CODES.END_CODE.name());
+        Out.flush();
     }
 }

@@ -25,24 +25,20 @@ abstract public class AbstractProducer extends AbstractTasker implements Runnabl
     abstract protected TaskInterface ProduceNewTask();
 
     public void run() {
-        while (true) {
-            if (!thread.isInterrupted()) {
-                CurrentTask = ProduceNewTask();
-                try {
+        try {
+            while (true) {
+                if (!thread.isInterrupted()) {
+                    CurrentTask = ProduceNewTask();
                     PutTask();
-                } catch (InterruptedException e) {
+                } else {
                     return;
                 }
-            }
-            else {
-                return;
-            }
 
-            try {
                 Thread.sleep(SleepTime);
-            } catch (InterruptedException e) {
-                return;
             }
+        }
+        catch (InterruptedException ignored) {
+
         }
     }
 
