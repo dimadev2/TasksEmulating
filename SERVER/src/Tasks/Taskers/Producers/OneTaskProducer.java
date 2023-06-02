@@ -6,7 +6,7 @@ import Tasks.TaskStorage;
 
 public class OneTaskProducer extends AbstractProducer {
     public OneTaskProducer(TaskStorage storage, Integer sleepTime) {
-        super(storage, sleepTime, "OneTaskProducer [" + GetProducerCount() + "]");
+        super(storage, sleepTime, "OneTaskProducer [" + (GetProducerCount() + 1) + "]");
     }
 
     public TaskInterface ProduceNewTask() {

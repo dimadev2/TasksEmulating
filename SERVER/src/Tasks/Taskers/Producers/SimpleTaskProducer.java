@@ -6,7 +6,7 @@ import Tasks.TaskStorage;
 
 final public class SimpleTaskProducer extends AbstractProducer implements Runnable {
     public SimpleTaskProducer(TaskStorage storage, Integer sleepTime) {
-        super(storage, sleepTime, "SimpleTaskProducer [" + GetProducerCount() + "]");
+        super(storage, sleepTime, "SimpleTaskProducer [" + (GetProducerCount() + 1) + "]");
     }
 
     public TaskInterface ProduceNewTask() {
